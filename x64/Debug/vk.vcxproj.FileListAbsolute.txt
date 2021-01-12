@@ -1,0 +1,4 @@
+C:\Users\tran9\source\repos\vk\x64\Debug\vk.exe
+C:\Users\tran9\source\repos\vk\x64\Debug\vk.pdb
+C:\Users\tran9\Desktop\vk\x64\Debug\vk.exe
+C:\Users\tran9\Desktop\vk\x64\Debug\vk.pdb
