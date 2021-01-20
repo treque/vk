@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <algorithm>
+#include <vector>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -21,7 +23,6 @@ private:
 	GLFWwindow* window;
 	VkInstance instance;
 
-
 	void initWindow()
 	{
 		glfwInit();
@@ -33,6 +34,8 @@ private:
 	void initVulkan()
 	{
 		createInstance();
+		bool supported = checkExtensionsSupport();
+		std::cout << "Required extensions supported?" << supported;
 	}
 
 	void mainLoop()
@@ -45,6 +48,7 @@ private:
 
 	void cleanup()
 	{
+		vkDestroyInstance(instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
@@ -72,8 +76,45 @@ private:
 		createInfo.ppEnabledExtensionNames = glfwExtensions;
 		createInfo.enabledLayerCount = 0;
 
-		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
+		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+			throw std::runtime_error("Failed to create instance");
+		}
 	}
+
+	bool checkExtensionsSupport()
+	{
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions;
+
+		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+
+		uint32_t extensionCount = 0;
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> extensions(extensionCount);
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+
+		for (uint32_t i = 0; i < glfwExtensionCount; ++i)
+		{
+			bool found = false;
+			while (!found)
+			{
+				for (const auto& extension : extensions)
+				{
+					if (strcmp(extension.extensionName, glfwExtensions[i]) == 0)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					return false;
+			}
+		}
+		return true;
+	}
+
 };
 
 int main()
