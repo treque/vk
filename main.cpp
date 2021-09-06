@@ -33,6 +33,7 @@ public:
 private:
 	GLFWwindow* window;
 	VkInstance instance;
+	VkDebugUtilsMessengerEXT debugMessenger;
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -55,6 +56,7 @@ private:
 	void initVulkan()
 	{
 		createInstance();
+		setupDebugMessenger();
 		bool supported = checkExtensionsSupport();
 		std::cout << "Required extensions supported?" << supported;
 	}
@@ -181,6 +183,15 @@ private:
 
 		if (enableValidationLayers) extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		return extensions;
+	}
+
+	void setupDebugMessenger()
+	{
+		if (!enableValidationLayers) return;
+		VkDebugUtilsMessengerCreateInfoEXT createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE;
+
 	}
 	
 };
